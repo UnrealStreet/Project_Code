@@ -1,0 +1,149 @@
+#include <stdio.h>
+#include <conio.h>
+#include <graphics.h>
+#include <math.h>
+
+const double PI = 3.141592654;	// 定义圆周率
+
+
+// 画表盘
+void dial()
+{
+	// 画蓝色背景
+	setbkcolor(0xe6cdb4);		// 设置背景色
+	cleardevice();				// 清屏
+
+	// 画黄色外圆
+	setlinestyle(PS_SOLID, 10);	// 设置线宽为十个像素
+	setlinecolor(YELLOW);		// 设置画线颜色为黄色
+	setfillcolor(WHITE);		// 设置填充颜色为白色
+	fillcircle(0, 0, 170);		// 画圆
+
+	// 填充扇形颜色
+	int r = 150;				// 定义半径为 150
+	setlinestyle(PS_SOLID, 2);	// 设置线宽为两像素
+	for (int n = 0; n < 10; n++)
+	{
+		// 画橘子瓣的三次贝塞尔曲线
+		POINT pts[13];				// 定义数组，起始点、控制点 1、控制点 2、终点（起点）、控制点 1、控制点 2、终点（起点）……
+		double a = 2 * PI * n / 10;	// 橘子瓣弧度
+		pts[0].x = int(r / 8 * cos(a + 2 * PI / 22));
+		pts[0].y = int(r / 8 * sin(a + 2 * PI / 22));	pts[12] = pts[11] = pts[0];
+		pts[1].x = int(r / 12 * cos(a + 2 * PI / 22));	pts[2].x = int(r / 12 * cos(a - 2 * PI / 22));
+		pts[1].y = int(r / 12 * sin(a + 2 * PI / 22));	pts[2].y = int(r / 12 * sin(a - 2 * PI / 22));
+		pts[3].x = int(r / 8 * cos(a - 2 * PI / 22));
+		pts[3].y = int(r / 8 * sin(a - 2 * PI / 22));	pts[4] = pts[3];
+		pts[5].x = int(r * cos(a - 2 * PI / 22));
+		pts[5].y = int(r * sin(a - 2 * PI / 22));		pts[6] = pts[5];
+		pts[9].x = int(r * cos(a + 2 * PI / 22));
+		pts[9].y = int(r * sin(a + 2 * PI / 22));		pts[10] = pts[9];
+		pts[7].x = int(r * 1.1 * cos(a - 2 * PI / 30));	pts[8].x = int(r * 1.1 * cos(a + 2 * PI / 30));
+		pts[7].y = int(r * 1.1 * sin(a - 2 * PI / 30));	pts[8].y = int(r * 1.1 * sin(a + 2 * PI / 30));
+
+		int c = HSLtoRGB(36.0f * n, 0.8f, 0.8f);				// 设置彩虹色
+		setlinecolor(c);										// 设置画线颜色为彩虹色
+		polybezier(pts, 13);									// 画三次贝塞尔曲线	
+
+		setfillcolor(c);										// 设置填充色为彩虹色
+		floodfill(int(r / 2 * cos(a)), int(r / 2 * sin(a)), c);	// 填充橘子瓣
+	}
+
+	// 显示表盘细节
+	settextcolor(BLACK);				// 设置字体颜色
+	setbkmode(TRANSPARENT);				// 设置背景色为透明
+	for (int n = 0; n < 12; n++)
+	{
+		// 整点刻度
+		setfillcolor(BLACK);
+		solidcircle(int(145 * cos(n * 2 * PI / 12)), -int(145 * sin(n * 2 * PI / 12)), 2);
+		solidcircle(int(145 * cos(n * 2 * PI / 4)), -int(145 * sin(n * 2 * PI / 4)), 4);
+
+		// 显示数字
+		wchar_t s[10];
+		swprintf_s(s, 10, L"%d", 12 - n);		// int 类型转换成 char 类型
+
+		// 设置字体、大小及输出
+		if ((12 - n) % 3 == 0)	settextstyle(48, 0, L"Broadway");
+		else					settextstyle(24, 0, L"Broadway");
+
+		// 定义字符串长和宽，居中
+		int w, h;
+		w = textwidth(s);
+		h = textheight(s);
+		outtextxy(int(125 * cos(n * 2 * PI / 12 + PI / 2) - w / 2),
+			-int(125 * sin(n * 2 * PI / 12 + PI / 2) - h / 2),
+			s);
+	}
+}
+
+
+// 显示数字时钟
+void digital(int h, int m, int s)
+{
+	// 画显示当前时间的三个小矩形
+	setlinecolor(LIGHTGRAY);	// 设置边框颜色为浅灰色
+	setfillcolor(WHITE);		// 设置填充颜色为白色
+	fillrectangle(-40 - 13, 50, -40 + 13, 50 + 26);
+	fillrectangle(-13, 50, 13, 50 + 26);
+	fillrectangle(40 - 13, 50, 40 + 13, 50 + 26);
+
+	// 显示当前时间
+	settextstyle(24, 0, L"Consolas");
+	wchar_t a[10];
+	int w;
+	swprintf_s(a, 10, L"%d", h);	w = textwidth(a);	outtextxy(-40 - w / 2, 50, a);
+	swprintf_s(a, 10, L"%d", m);	w = textwidth(a);	outtextxy(-w / 2, 50, a);
+	swprintf_s(a, 10, L"%d", s);	w = textwidth(a);	outtextxy(40 - w / 2, 50, a);
+}
+
+
+// 画表针
+void needles(int h, int m, int s)
+{
+	double a = PI / 2 - (2 * PI * h / 12 + 2 * PI * 1 / 12 * m / 60);	// 时针所走弧度
+	double b = PI / 2 - (2 * PI * m / 60 + 2 * PI * 1 / 60 * s / 60);	// 分针所走弧度
+	double c = PI / 2 - 2 * PI * s / 60;								// 秒针所走弧度
+
+	setlinecolor(BLACK);												// 设置画线颜色为黑色
+	setlinestyle(PS_SOLID, 9);											// 设置线宽为九像素
+	line(0, 0, int(50 * cos(a)), int(-50 * sin(a)));					// 画时针
+
+	setlinestyle(PS_SOLID, 6);											// 设置线宽为六像素
+	line(0, 0, int(100 * cos(b)), int(-100 * sin(b)));					// 画分针
+
+	setlinecolor(RED);													// 设置画线颜色为红色
+	setlinestyle(PS_SOLID, 3);											// 设置线宽为三像素
+	line(int(20 * cos(c + PI)), -int(20 * sin(c + PI)), int(130 * cos(c)), -int(130 * sin(c)));	// 画秒针
+}
+
+
+// 主函数
+int main()
+{
+	// 创建绘图窗口
+	initgraph(640, 480);
+	BeginBatchDraw();		// 开启批量绘图
+	setorigin(320, 240);	// 设置原点
+
+	while (true)
+	{
+		// 计算
+		SYSTEMTIME ti;		// 定义变量保存当前时间
+		GetLocalTime(&ti);	// 获取当前时间
+
+		// 绘画
+		cleardevice();
+		dial();										// 画表盘
+		digital(ti.wHour, ti.wMinute, ti.wSecond);	// 画数字时钟
+		needles(ti.wHour, ti.wMinute, ti.wSecond);	// 画表针
+
+		// 延时
+		FlushBatchDraw();
+		Sleep(1000);
+	}
+
+	_getch();
+	EndBatchDraw();
+	closegraph();
+	return 0;
+}
