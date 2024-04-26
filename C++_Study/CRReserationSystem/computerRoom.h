@@ -9,5 +9,7 @@ class ComputerRoom {
 public:
     int comId; //机房编号
     int maxNum; //机房最大容量
+    int capacity; //机房当前容量
+
     ComputerRoom() = default;
 };

@@ -27,9 +27,11 @@ void Manager::operMenu() {
     cout << "\t\t|                                |\n";
     cout << "\t\t|          2.查看账号            |\n";
     cout << "\t\t|                                |\n";
-    cout << "\t\t|          3.查看机房            |\n";
+    cout << "\t\t|          3.删除账号            |\n";
     cout << "\t\t|                                |\n";
-    cout << "\t\t|          4.清空预约            |\n";
+    cout << "\t\t|          4.查看机房            |\n";
+    cout << "\t\t|                                |\n";
+    cout << "\t\t|          5.清空预约            |\n";
     cout << "\t\t|                                |\n";
     cout << "\t\t|          0.注销登录            |\n";
     cout << "\t\t|                                |\n";
@@ -53,10 +55,13 @@ void Manager::menu(Identity *manager) {
             case 2://查看账号
                 man->showAccount();
                 break;
-            case 3://查看机房信息
+            case 3://删除账号
+                man->deleteAccount();
+                break;
+            case 4://查看机房信息
                 man->showComputer();
                 break;
-            case 4://清空预约记录
+            case 5://清空预约记录
                 man->cleanOrder();
                 break;
             case 0://注销登录
@@ -70,9 +75,9 @@ void Manager::menu(Identity *manager) {
 
 //添加账号
 void Manager::addAccount() {
-    cout << "请选择添加账号类型：" << endl;
     cout << "1.添加学生账号" << endl;
     cout << "2.添加老师账号" << endl;
+    cout << "请选择添加账号类型：";
 
     string fileName;//操作文件名
     string tip;//提示id号
@@ -96,7 +101,6 @@ void Manager::addAccount() {
     string pwd;//密码
     cout << tip;
     while (true) {
-        cout << "请输入id：";
         cin >> id;
         if (checkRepeat(id, select)) {
             cout << errorTip << endl;
@@ -119,10 +123,16 @@ void Manager::addAccount() {
 
 //查看账号
 void Manager::showAccount() {
-    cout << "请选择查看账号类型：" << endl;
     cout << "1.查看学生账号" << endl;
     cout << "2.查看老师账号" << endl;
+    cout << "请选择查看账号类型：";
     int select = readMenuSelection(3);
+    printAccount(select);
+    waitConfirm();
+}
+
+//打印账号信息
+void Manager::printAccount(int select) {
     if (select == 1) {
         cout << "所有学生账号信息如下：" << endl;
         cout << "学号\t\t姓名\t\t密码" << endl;
@@ -132,7 +142,7 @@ void Manager::showAccount() {
                  << s.m_Pwd << endl;
         });
     } else {
-        cout << "老师账号信息如下：" << endl;
+        cout << "所有老师账号信息如下：" << endl;
         cout << "职工号\t\t姓名\t\t密码" << endl;
         for_each(vTea.begin(), vTea.end(), [](Teacher &t) {
             cout << t.empId << "\t\t"
@@ -140,8 +150,55 @@ void Manager::showAccount() {
                  << t.m_Pwd << endl;
         });
     }
-    waitConfirm();
 }
+
+
+//删除账号
+void Manager::deleteAccount() {
+    cout << "1.删除学生账号" << endl;
+    cout << "2.删除老师账号" << endl;
+    cout << "请选择删除账号类型：";
+    int select = readMenuSelection(3);
+    printAccount(select);
+    if (select == 1) {
+        cout << "请输入要删除的学生学号：";
+        int id = readMenuSelection(10001);
+        for (auto it = vStu.begin(); it != vStu.end(); ++it) {
+            if (it->stuId == id) {
+                vStu.erase(it);
+                cout << "删除成功！！！" << endl;
+                ofstream ofs(STUDENT_FILE, ios::trunc);
+                for (auto &s: vStu) {
+                    ofs << s.stuId << " " << s.m_Name << " " << s.m_Pwd << endl;
+                }
+                ofs.close();//关闭文件
+                waitConfirm();
+                return;
+            }
+        }
+        cout << "未找到该学生学号！！！" << endl;
+        waitConfirm();
+    } else {
+        cout << "请输入要删除的老师职工号：";
+        int id = readMenuSelection(10001);
+        for (auto it = vTea.begin(); it != vTea.end(); ++it) {
+            if (it->empId == id) {
+                vTea.erase(it);
+                ofstream ofs(TEACHER_FILE, ios::trunc);
+                for (auto &t: vTea) {
+                    ofs << t.empId << " " << t.m_Name << " " << t.m_Pwd << endl;
+                }
+                ofs.close();//关闭文件
+                cout << "删除成功！！！" << endl;
+                waitConfirm();
+                return;
+            }
+        }
+        cout << "未找到该老师职工号！！！" << endl;
+        waitConfirm();
+    }
+}
+
 
 //查看机房信息
 void Manager::showComputer() {
@@ -149,14 +206,15 @@ void Manager::showComputer() {
     cout << "机房编号\t机房最大容量" << endl;
     for_each(vCom.begin(), vCom.end(), [](ComputerRoom &c) {
         cout << c.comId << "\t\t"
-             << c.maxNum << endl;
+             << c.maxNum << "\t\t"
+             << c.capacity << endl;
     });
     waitConfirm();
 }
 
 //清空预约记录
 void Manager::cleanOrder() {
-    cout << "确定清空预约记录吗？" << endl;
+    cout << "确定清空预约记录吗？(Y/N)" << endl;
     if (readQuitConfirm() == 'Y') {
         ofstream ofs(ORDER_FILE, ios::trunc);
         ofs.close();
@@ -204,7 +262,7 @@ void Manager::initComputer() {
         return;
     }
     ComputerRoom com;
-    while (ifs >> com.comId >> com.maxNum) {
+    while (ifs >> com.comId >> com.maxNum >> com.capacity) {
         vCom.push_back(com);
     }
     ifs.close();

@@ -76,7 +76,7 @@ void Student::initComputer() {
         return;
     }
     ComputerRoom com{};
-    while (ifs >> com.comId >> com.maxNum) {
+    while (ifs >> com.comId >> com.maxNum >> com.capacity) {
         vCom.push_back(com);
     }
     ifs.close();
@@ -101,7 +101,7 @@ void Student::applyOrder() {
     //机房编号
     int room;
     for (auto &c: vCom) {
-        cout << c.comId << "号机房容量：" << c.maxNum << endl;
+        cout << c.comId << "号机房剩余容量：" << c.capacity << endl;
     }
     cout << "请选择机房：";
     room = readMenuSelection(4);

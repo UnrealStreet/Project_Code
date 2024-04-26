@@ -11,6 +11,23 @@ Teacher::Teacher(int empId, string name, string pwd) {
     this->empId = empId;
     this->m_Name = std::move(name);
     this->m_Pwd = std::move(pwd);
+    this->initComputer();
+}
+
+//初始化机房信息
+void Teacher::initComputer() {
+    ifstream ifs;
+    ifs.open(COMPUTER_FILE, ios::in);
+    if (!ifs.is_open()) {
+        cout << "机房文件不存在" << endl;
+        ifs.close();
+        return;
+    }
+    ComputerRoom com{};
+    while (ifs >> com.comId >> com.maxNum >> com.capacity) {
+        vCom.push_back(com);
+    }
+    ifs.close();
 }
 
 //菜单界面
@@ -68,6 +85,7 @@ void Teacher::validOrder() {
         int index = 0;
         cout << "\n待审核的预约记录如下：" << endl;
         bool flag = false;
+        //显示所有预约记录
         for (int i = 0; i < of.m_Size; ++i) {
             if (of.m_orderData[i]["status"] == "1") {
                 v.push_back(i);
@@ -98,6 +116,12 @@ void Teacher::validOrder() {
             if (confirm == 1) {
                 of.m_orderData[v[select - 1]]["status"] = "2";
                 cout << "已同意该学生的申请！" << endl;
+                if (of.m_orderData[v[select - 1]]["roomId"] == "1")
+                    vCom[0].capacity--;
+                else if(of.m_orderData[v[select - 1]]["roomId"] == "2")
+                    vCom[1].capacity--;
+                else
+                    vCom[2].capacity--;
             } else {
                 of.m_orderData[v[select - 1]]["status"] = "-1";
                 cout << "已取消该学生的申请！" << endl;

@@ -31,6 +31,9 @@ public:
 
     //查看账号
     void showAccount();
+    void printAccount(int select);
+    //删除账号
+    void deleteAccount();
 
     //查看机房信息
     void showComputer();

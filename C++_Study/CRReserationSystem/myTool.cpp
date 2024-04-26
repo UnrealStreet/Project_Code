@@ -106,6 +106,7 @@ pair<int,string> selectTime() {
     int i = 1;
     if (days_to_friday == 0) {
         days_to_friday = 7; // 如果今天就是周五，那么输出下周的周一至周五
+        wday = 0;
         i = 3;
     }
     ostringstream oss;// 字符串输出流
