@@ -29,6 +29,15 @@ void Teacher::initComputer() {
     }
     ifs.close();
 }
+//更新机房信息
+void Teacher::updateComputer() {
+    ofstream ofs;
+    ofs.open(COMPUTER_FILE, ios::trunc);
+    for (auto &c : vCom) {
+        ofs << c.comId << " " << c.maxNum << " " << c.capacity << endl;
+    }
+    ofs.close();
+}
 
 //菜单界面
 void Teacher::operMenu() {
@@ -122,6 +131,7 @@ void Teacher::validOrder() {
                     vCom[1].capacity--;
                 else
                     vCom[2].capacity--;
+                updateComputer();
             } else {
                 of.m_orderData[v[select - 1]]["status"] = "-1";
                 cout << "已取消该学生的申请！" << endl;

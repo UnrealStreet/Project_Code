@@ -2,10 +2,12 @@
 // Created by GOD婴宁 on 2024/4/22.
 //
 #include "globalFile.h"
+
 using namespace std;
 
 int main() {
     int choice = 0;
+    cleanOrder();
     do {
         system("cls");
         mainMenu();

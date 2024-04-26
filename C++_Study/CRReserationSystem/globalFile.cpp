@@ -5,9 +5,9 @@
 #include "student.h"
 #include "teacher.h"
 #include "manager.h"
+#include "orderFile.h"
 
-
-//定义通用函数体
+//定义通用主界面函数体
 void mainMenu() {
     cout << "=====================  欢迎来到客机房预约系统  ====================" << endl;
     cout << endl << "\t\t\t  请选择您的身份" << endl;
@@ -100,3 +100,39 @@ void loginIn(const string &fileName, int type) {
     waitConfirm(1);
 }
 
+//清楚过期的预约记录
+void cleanOrder() {
+    // 获取当前时间
+    auto now = chrono::system_clock::now();
+
+    // 将时间点转换为时间_t
+    time_t now_time_t = chrono::system_clock::to_time_t(now);
+
+    // 将时间_t转换为日期字符串
+    tm tm{};
+    localtime_s(&tm, &now_time_t);
+    int cMonth = tm.tm_mon + 1;//当前月份（月份是从0开始的）
+    int cDay = tm.tm_mday;//当前日期
+    int cWen = tm.tm_wday;//当前星期几
+    OrderFile of;
+    if (of.m_Size == 0 || cWen != 0)//如果没有预约记录或者不是星期天，则直接返回
+        return;
+    //遍历并删除今天之前的所有预约记录（在星期天执行清理任务）
+    ofstream ofs(ORDER_FILE, ios::out | ios::trunc);
+    for (int i = 0; i < of.m_Size; ++i) {
+        int month = stoi(of.m_orderData[i]["data"].substr(0, 2));
+        int day = stoi(of.m_orderData[i]["data"].substr(4, 2));
+        //如果预约日期小于当前日期，则删除
+        if (month < cMonth || day < cDay) {//清理今天之前的所有日期 可以改为清理一周前的所有信息
+            of.m_orderData.erase(i);
+        } else {//写入不需要删除的日期
+            ofs << "stuId:" << of.m_orderData[i]["stuId"]
+                << " stuName:" << of.m_orderData[i]["stuName"]
+                << " data:" << of.m_orderData[i]["data"]
+                << " interval:" << of.m_orderData[i]["interval"]
+                << " roomId:" << of.m_orderData[i]["roomId"]
+                << " status:" << of.m_orderData[i]["status"] << endl;
+        }
+    }
+    ofs.close();
+}

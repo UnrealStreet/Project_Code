@@ -21,6 +21,9 @@ public:
     //初始化机房信息
     void initComputer();
 
+    //更新机房信息
+    void updateComputer();
+
     //菜单界面
     void operMenu() override;
 

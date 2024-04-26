@@ -203,7 +203,7 @@ void Manager::deleteAccount() {
 //查看机房信息
 void Manager::showComputer() {
     cout << "机房信息如下：" << endl;
-    cout << "机房编号\t机房最大容量" << endl;
+    cout << "机房编号\t机房最大容量\t机房剩余容量" << endl;
     for_each(vCom.begin(), vCom.end(), [](ComputerRoom &c) {
         cout << c.comId << "\t\t"
              << c.maxNum << "\t\t"

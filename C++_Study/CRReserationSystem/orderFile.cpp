@@ -52,9 +52,8 @@ pair<string, string> OrderFile::interOrderData(string &s) {
 
 //更新预约记录
 void OrderFile::updateOrder() {
-    if (this->m_Size == 0) {
+    if (this->m_Size == 0)
         return;
-    }
     ofstream ofs(ORDER_FILE, ios::out | ios::trunc);
     for (int i = 0; i < this->m_Size; ++i) {
         ofs << "stuId:" << this->m_orderData[i]["stuId"]
