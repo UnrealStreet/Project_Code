@@ -29,15 +29,6 @@ void Teacher::initComputer() {
     }
     ifs.close();
 }
-//更新机房信息
-void Teacher::updateComputer() {
-    ofstream ofs;
-    ofs.open(COMPUTER_FILE, ios::trunc);
-    for (auto &c : vCom) {
-        ofs << c.comId << " " << c.maxNum << " " << c.capacity << endl;
-    }
-    ofs.close();
-}
 
 //菜单界面
 void Teacher::operMenu() {
@@ -71,6 +62,7 @@ void Teacher::menu(Identity *teacher) {
                 tea->validOrder();
                 break;
             default://注销登录0
+                updateComputerNum();
                 delete teacher;
                 cout << "注销成功！" << endl;
                 waitConfirm();
@@ -87,6 +79,7 @@ void Teacher::validOrder() {
         waitConfirm();
         return;
     }
+    //循环审核预约记录
     while (true) {
         system("cls");
         this->operMenu();
@@ -108,6 +101,7 @@ void Teacher::validOrder() {
                 flag = true;
             }
         }
+        //没有需要审核的预约记录
         if (!flag) {
             cout << "无需要审核的预约记录！" << endl;
             waitConfirm();
@@ -127,11 +121,10 @@ void Teacher::validOrder() {
                 cout << "已同意该学生的申请！" << endl;
                 if (of.m_orderData[v[select - 1]]["roomId"] == "1")
                     vCom[0].capacity--;
-                else if(of.m_orderData[v[select - 1]]["roomId"] == "2")
+                else if (of.m_orderData[v[select - 1]]["roomId"] == "2")
                     vCom[1].capacity--;
                 else
                     vCom[2].capacity--;
-                updateComputer();
             } else {
                 of.m_orderData[v[select - 1]]["status"] = "-1";
                 cout << "已取消该学生的申请！" << endl;
@@ -140,4 +133,19 @@ void Teacher::validOrder() {
         }
         waitConfirm();
     }
+}
+
+//更新机房信息
+void Teacher::updateComputerNum() {
+    ofstream ofs;
+    ofs.open(COMPUTER_FILE, ios::trunc);
+    if (!ofs.is_open()) {
+        cout << "机房文件打开失败" << endl;
+        ofs.close();
+        return;
+    }
+    for (auto &c: vCom) {
+        ofs << c.comId << " " << c.maxNum << " " << c.capacity << endl;
+    }
+    ofs.close();
 }

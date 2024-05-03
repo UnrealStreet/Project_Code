@@ -46,8 +46,8 @@ void Manager::menu(Identity *manager) {
         //调用管理员子菜单
         manager->operMenu();
         //将父类指针转为子类指针，调用子类中的特有接口
-        Manager *man = (Manager *) manager;
-        int select = readMenuSelection(5);
+        auto *man = (Manager *) manager;
+        int select = readMenuSelection(6);
         switch (select) {
             case 1://添加账号
                 man->addAccount();

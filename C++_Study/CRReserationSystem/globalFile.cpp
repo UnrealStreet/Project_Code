@@ -65,6 +65,7 @@ void loginIn(const string &fileName, int type) {
                 person = new Student(id, name, pwd);
                 //进入学生子菜单
                 person->menu(person);
+
                 return;
             }
         }
@@ -100,7 +101,7 @@ void loginIn(const string &fileName, int type) {
     waitConfirm(1);
 }
 
-//清楚过期的预约记录
+//清楚过期的预约记录,每周日清理一次  可以改为清理一周前的所有信息
 void cleanOrder() {
     // 获取当前时间
     auto now = chrono::system_clock::now();

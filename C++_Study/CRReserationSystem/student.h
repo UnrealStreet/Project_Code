@@ -31,9 +31,12 @@ public:
     void applyOrder();
 
     //查看自身预约
-    void showMyOrder();
+    void showMyOrder() const;
 
     //取消预约
     void cancelOrder();
+
+    //更新机房信息
+    void updateComputerNum();
 };
 

@@ -74,6 +74,7 @@ void OrderFile::showAllOrder() {
         waitConfirm();
         return;
     }
+    cout << "下列是所有预约记录：" << endl;
     for (int i = 0; i < of.m_Size; ++i) {
         cout << i + 1 << ".";
         cout << "学号：" << of.m_orderData[i]["stuId"] << "\t";

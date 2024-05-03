@@ -1,5 +1,5 @@
 stuId:1 stuName:张三 data:04月26日(周一) interval:1 roomId:1 status:0
-stuId:1 stuName:张三 data:04月26日(周一) interval:1 roomId:1 status:2
+stuId:1 stuName:张三 data:04月26日(周一) interval:1 roomId:1 status:0
 stuId:1 stuName:张三 data:04月26日(周一) interval:2 roomId:1 status:2
 stuId:1 stuName:张三 data:04月26日(周一) interval:2 roomId:2 status:2
 stuId:2 stuName:李四 data:04月26日(周一) interval:1 roomId:1 status:2
@@ -8,3 +8,6 @@ stuId:2 stuName:李四 data:04月26日(周一) interval:1 roomId:1 status:-1
 stuId:3 stuName:王五 data:04月26日(周一) interval:1 roomId:1 status:2
 stuId:3 stuName:王五 data:04月26日(周一) interval:1 roomId:3 status:-1
 stuId:3 stuName:王五 data:04月26日(周一) interval:1 roomId:3 status:2
+stuId:1 stuName:张三 data:05月08日(周三) interval:1 roomId:3 status:0
+stuId:2 stuName:李四 data:05月09日(周四) interval:1 roomId:2 status:0
+stuId:1 stuName:张三 data:05月10日(周五) interval:2 roomId:3 status:1

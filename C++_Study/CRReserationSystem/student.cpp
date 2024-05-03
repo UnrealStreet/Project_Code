@@ -42,7 +42,7 @@ void Student::menu(Identity *student) {
         //调用学生子菜单
         student->operMenu();
         //将父类指针转为子类指针，调用学生类中的特有接口
-        Student *stu = (Student *) student;
+        auto *stu = (Student *) student;
         int select = readMenuSelection(5);
         switch (select) {
             case 1:
@@ -58,6 +58,7 @@ void Student::menu(Identity *student) {
                 stu->cancelOrder();
                 break;
             default://注销登录0
+                updateComputerNum();
                 delete student;
                 cout << "注销成功！！！" << endl;
                 waitConfirm();
@@ -115,7 +116,7 @@ void Student::applyOrder() {
 }
 
 //查看自身预约
-void Student::showMyOrder() {
+void Student::showMyOrder() const {
     OrderFile of;
     if (of.m_Size == 0) {
         cout << "系统中无预约记录" << endl;
@@ -124,6 +125,7 @@ void Student::showMyOrder() {
     }
     bool flag = false;
     //显示预约记录
+    cout << "下列是您的预约记录：" << endl;
     for (int i = 0; i < of.m_Size; ++i) {
         if (of.m_orderData[i]["stuId"] == to_string(this->stuId)) {//找到自己的预约记录
             cout << "预约日期：" << of.m_orderData[i]["data"] << "\t";
@@ -186,6 +188,13 @@ void Student::cancelOrder() {
         cout << "是否确认取消？(Y/N):";
         if (readQuitConfirm() == 'Y') {
             of.m_orderData[v[select - 1]]["status"] = "0";
+            int roomId = stoi(of.m_orderData[v[select - 1]]["roomId"]);
+            if (roomId == 1)
+                vCom[0].capacity++;
+            else if (roomId == 2)
+                vCom[1].capacity++;
+            else
+                vCom[2].capacity++;
             of.updateOrder();
             cout << "取消成功！" << endl;
         } else {
@@ -193,4 +202,19 @@ void Student::cancelOrder() {
         }
     }
     waitConfirm();
+}
+
+//修改文件中的机房数量
+void Student::updateComputerNum() {
+    ofstream ofs(COMPUTER_FILE, ios::out | ios::trunc);
+    if (!ofs.is_open()) {
+        cout << "机房文件打开失败"
+             << "\n 文件未能保存，请重新操作" << endl;
+        ofs.close();
+        return;
+    }
+    for (auto &i: vCom) {
+        ofs << i.comId << " " << i.maxNum << " " << i.capacity << endl;
+    }
+    ofs.close();
 }
