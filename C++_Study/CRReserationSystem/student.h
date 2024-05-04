@@ -31,7 +31,10 @@ public:
     void applyOrder();
 
     //查看自身预约
-    void showMyOrder() const;
+    void showMyOrder();
+
+    //按照日期排序
+    void compare( OrderFile &of);
 
     //取消预约
     void cancelOrder();

@@ -76,15 +76,9 @@ using namespace std;
 
 int main() {
     map<int,string > m;
-    m.insert(make_pair(0,"zero"));
     m.insert(make_pair(1,"one"));
     m.insert(make_pair(2,"two"));
-    m.insert(make_pair(3,"three"));
-    m.insert(make_pair(4,"four"));
-    m.insert(make_pair(5,"five"));
-    m.erase(m.find(0));
-    cout <<m.size();
-//    for (int i = 0; i < 6; ++i) {
-//        cout << m[i] << endl;
-//    }
+    swap(m[1],m[2]);
+    cout << m[1] << " " << m[2] << endl;
+    return 0;
 }

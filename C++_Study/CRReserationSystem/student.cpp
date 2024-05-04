@@ -116,7 +116,7 @@ void Student::applyOrder() {
 }
 
 //查看自身预约
-void Student::showMyOrder() const {
+void Student::showMyOrder() {
     OrderFile of;
     if (of.m_Size == 0) {
         cout << "系统中无预约记录" << endl;
@@ -146,8 +146,56 @@ void Student::showMyOrder() const {
             flag = true;
         }
     }
-    if (!flag)
+    if (!flag) {
         cout << "无属于您的预约记录！" << endl;
+        waitConfirm();
+    } else {
+        cout << "是否需要按照日期排序？(Y/N):";
+        if (readQuitConfirm() == 'Y')
+            compare(of);
+        else
+            return;
+    }
+}
+
+//按照日期大小排序
+void Student::compare(OrderFile &of) {
+    vector<int> v;//存放自己的预约记录
+    for (int i = 0; i < of.m_Size; ++i) {
+        if (of.m_orderData[i]["stuId"] == to_string(this->stuId)) {//找到自己的预约记录
+            v.push_back(i);
+        }
+    }
+    //冒泡排序
+    for (int i = 0; i < v.size() - 1; ++i) {
+        for (int j = 0; j < v.size() - i - 1; ++j) {
+            int date1M = stoi(of.m_orderData[v[j]]["data"].substr(0, 2));
+            int date1D = stoi(of.m_orderData[v[j]]["data"].substr(4, 2));
+            int date2M = stoi(of.m_orderData[v[j + 1]]["data"].substr(0, 2));
+            int date2D = stoi(of.m_orderData[v[j + 1]]["data"].substr(4, 2));
+            if (date1M >= date2M && date1D > date2D) {
+                swap(of.m_orderData[v[j]], of.m_orderData[v[j + 1]]);
+            }
+        }
+    }
+    //打印排好序的预约
+    for (int i: v) {
+        cout << "预约日期：" << of.m_orderData[i]["data"] << "\t";
+        cout << "时间段：" << (of.m_orderData[i]["interval"] == "1" ? "上午" : "下午") << "\t";
+        cout << "机房：" << of.m_orderData[i]["roomId"] << "\t";
+        string status = "状态：\t";
+        //状态 1为审核中 2为预约成功 -1为审核未通过 0为预约取消
+        if (of.m_orderData[i]["status"] == "1") {
+            status += "审核中";
+        } else if (of.m_orderData[i]["status"] == "2") {
+            status += "预约成功";
+        } else if (of.m_orderData[i]["status"] == "-1") {
+            status += "预约失败,审核未通过";
+        } else {
+            status += "预约已取消";
+        }
+        cout << status << endl;
+    }
     waitConfirm();
 }
 
