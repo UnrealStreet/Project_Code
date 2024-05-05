@@ -173,7 +173,7 @@ void Student::compare(OrderFile &of) {
             int date1D = stoi(of.m_orderData[v[j]]["data"].substr(4, 2));
             int date2M = stoi(of.m_orderData[v[j + 1]]["data"].substr(0, 2));
             int date2D = stoi(of.m_orderData[v[j + 1]]["data"].substr(4, 2));
-            if (date1M >= date2M && date1D > date2D) {
+            if (date1M >= date2M && date1D > date2D) {//日期大的排在后面，从小到大排序
                 swap(of.m_orderData[v[j]], of.m_orderData[v[j + 1]]);
             }
         }

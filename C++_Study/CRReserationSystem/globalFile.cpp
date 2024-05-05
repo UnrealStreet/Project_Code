@@ -120,6 +120,12 @@ void cleanOrder() {
         return;
     //遍历并删除今天之前的所有预约记录（在星期天执行清理任务）
     ofstream ofs(ORDER_FILE, ios::out | ios::trunc);
+    if (!ofs.is_open()) {
+        cout << "预约文件打开失败,未能删除过期的预约记录，请打开文件处理，并检查文件和相关代码" << endl;
+        ofs.close();
+        return;
+    }
+    vector<int> vIndex;//记录预约成功的机房数量
     for (int i = 0; i < of.m_Size; ++i) {
         int month = stoi(of.m_orderData[i]["data"].substr(0, 2));
         int day = stoi(of.m_orderData[i]["data"].substr(4, 2));
@@ -133,7 +139,21 @@ void cleanOrder() {
                 << " interval:" << of.m_orderData[i]["interval"]
                 << " roomId:" << of.m_orderData[i]["roomId"]
                 << " status:" << of.m_orderData[i]["status"] << endl;
+            if (of.m_orderData[i]["status"] == "2")//记录预约成功的机房数量
+                vIndex.push_back(stoi(of.m_orderData[i]["roomId"]));
         }
     }
     ofs.close();
+    //更新机房容量
+    ofstream ofsCom(COMPUTER_FILE, ios::out | ios::trunc);
+    if (!ofsCom.is_open()) {
+        cout << "在清理预约记录之后,机房文件打开失败,未能同步修改机房文件，请手动查看文件处理" << endl;
+        ofsCom.close();
+        return;
+    }
+    int maxNum[3]  {20,50,100};//机房最大容量
+    for (int i = 0; i < 3; ++i) {
+        ofsCom << i+1 << " " << maxNum[i] << " " << maxNum[i] - count(vIndex.begin(), vIndex.end(), i+1) << endl;
+    }
+    ofsCom.close();
 }
