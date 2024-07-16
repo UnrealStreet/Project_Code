@@ -199,7 +199,7 @@ void changeDirection(deque<Snake> &snake) {
 }
 
 //生成食物，食物不能在蛇身上
-int createFood(deque<Snake> &snake, Food &food) {
+void createFood(deque<Snake> &snake, Food &food) {
     //生成食物,直到食物不在蛇身上为止
     while (true) {
         //随机生成食物
@@ -221,19 +221,11 @@ int createFood(deque<Snake> &snake, Food &food) {
             //绘制食物
             setfillcolor(RGB(255, 0, 0));
             fillrectangle(food.getX() * SIZE, food.getY() * SIZE, (food.getX() + 1) * SIZE, (food.getY() + 1) * SIZE);
-//            break;
+            break;
         }
-        int distance = 0;
-        //计算食物与蛇头的距离
-        distance = sqrt(pow(snake.front().getX() - food.getX(), 2) + pow(snake.front().getY() - food.getY(), 2));
-        distance = sqrt(distance);
-        return distance;
     }
 }
-//计算两点间的距离
-int con(int x1, int y1, int x2, int y2) {
-    return sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2));
-}
+
 
 //检测是否吃到食物
 bool isEatFood(const deque<Snake> &snake, const Food &food) {
@@ -258,40 +250,29 @@ int main() {
     createFood(snake, food);
     drawSnake(snake);
 
-    int distance = 0;
     int score = 0;
     while (true) {
-        //计算食物与蛇头的距离
-        if (distance != 0) {
+        moveSnake(snake);
+        //更改蛇移动方向
+        changeDirection(snake);
+        //判断是否吃到食物
+        if (isEatFood(snake, food)) {
+            //吃到食物分数加一
+            score++;
+            //生成食物
+            createFood(snake, food);
             //蛇移动
-            moveSnake(snake);
-            //更改蛇移动方向
-            changeDirection(snake);
-            distance--;
-        }else {
-            moveSnake(snake);
-            //更改蛇移动方向
-            changeDirection(snake);
-            //判断是否吃到食物
-            if (isEatFood(snake, food)) {
-                //吃到食物分数加一
-                score++;
-                //生成食物
-                distance = createFood(snake, food);
-                //蛇移动
-                moveSnake(snake, true);
-            }
-            distance = con(snake.front().getX(), snake.front().getY(), food.getX(), food.getY());
-            //设置得分信息
-            //1.颜色
-            settextcolor(RGB(255, 255, 255));
-            //2.字体
-            settextstyle(20, 0, _T("宋体"));
-            TCHAR scoreStr[16];
-            _stprintf(scoreStr, _T("Score: %d"), score);
-            //3.输出文字
-            outtextxy(0, 0, scoreStr);
+            moveSnake(snake, true);
         }
+        //设置得分信息
+        //1.颜色
+        settextcolor(RGB(255, 255, 255));
+        //2.字体
+        settextstyle(20, 0, _T("宋体"));
+        TCHAR scoreStr[16];
+        _stprintf(scoreStr, _T("Score: %d"), score);
+        //3.输出文字
+        outtextxy(0, 0, scoreStr);
     }
     return 0;
 }
