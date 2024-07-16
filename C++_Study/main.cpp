@@ -1,12 +1,20 @@
 #include <iostream>
 #include <string>
-//#include <vector>
+#include <vector>
+#include <graphics.h>
+#include <conio.h>
+//#include <stack>
+//#include <queue>
 //#include <random>
 //#include <chrono>
 //#include <ctime>
 //#include <iomanip>
+//#include <functional>
 //#include <algorithm>
-#include <map>
+//#include <numeric>
+//#include <climits>
+//#include <map>
+//#include <set>
 
 using namespace std;
 
@@ -15,13 +23,20 @@ using namespace std;
 //
 //    int test;
 //
-//    virtual void show() = 0;
+//    virtual void show() {
+//        cout << "我是动物" << endl;
+//    };
 //};
 //
 //class dog : public animal {
 //public:
-//    void show() override {
+//    using animal::show;
+//    virtual void show() {
 //        cout << "I'm a dog" << endl;
+//    }
+//
+//    void test() {
+//        show();
 //    }
 //};
 //
@@ -31,10 +46,9 @@ using namespace std;
 //    char name[18];
 //
 //    Husky(int a, char *b, int c) {
-//        test = a;
 //    }
 //
-//    void show() override {
+//    void show() {
 //        cout << "I'm a Husky" << endl;
 //    }
 //};
@@ -51,34 +65,7 @@ using namespace std;
 //    }
 //    return 0;
 //}
-
-
-//int main() {
-//    // 获取当前时间
-//    auto now = std::chrono::system_clock::now();
-//
-//    // 将时间点转换为时间_t
-//    std::time_t now_time_t = std::chrono::system_clock::to_time_t(now);
-//
-//    // 将时间_t转换为日期字符串
-//    std::tm tm{};
-//    localtime_s(&tm, &now_time_t);
-//    int month = tm.tm_mon + 1;
-//    int day = tm.tm_mday;
-//    // 按照 "月日" 的格式打印日期
-//    std::cout << std::put_time(&tm, "%m月%d日") << std::endl;
-//    string s = "04月30日(周五)";
-//    s = s.substr(4, 2);
-//    cout << stoi(s) << endl;
-//    cout << month << " " << day << endl;
-//    return 0;
-//}
-
 int main() {
-    map<int,string > m;
-    m.insert(make_pair(1,"one"));
-    m.insert(make_pair(2,"two"));
-    swap(m[1],m[2]);
-    cout << m[1] << " " << m[2] << endl;
+
     return 0;
 }

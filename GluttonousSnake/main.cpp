@@ -1,14 +1,18 @@
 #include <iostream>
 #include <deque>
 #include <easyx.h>
-#include <cmath>
+#include <mutex>
+#include <condition_variable>
 
 using std::cin;
 using std::cout;
 using std::deque;
 
 #define SIZE 20
-#define DELAY 200
+#define DELAY 100
+
+std::condition_variable cv;
+std::mutex cv_m;
 
 const int WIDTH = 640;
 const int HEIGHT = 480;
@@ -84,7 +88,8 @@ void drawSnake(deque<Snake> &snake) {
         fillrectangle(body.getX() * SIZE, body.getY() * SIZE, (body.getX() + 1) * SIZE, (body.getY() + 1) * SIZE);
     }
     //控制蛇的移动速度
-    Sleep(DELAY);
+    std::unique_lock<std::mutex> lk(cv_m);
+    cv.wait_for(lk, std::chrono::milliseconds(DELAY));
 }
 
 //判断游戏是否结束
@@ -158,46 +163,6 @@ void moveSnake(deque<Snake> &snake, bool grow = false) {
     drawSnake(snake);
 }
 
-//更改蛇移动方向
-void changeDirection(deque<Snake> &snake) {
-    ExMessage msg = {0};
-    //获取键盘消息
-    peekmessage(&msg, EX_KEY);
-    //判断按键
-    if (msg.message == WM_KEYDOWN) {
-        switch (msg.vkcode) {
-            case 'w':
-            case 'W':
-            case VK_UP:
-                //不可以反方向移动
-                if (snake.front().getDir() != DOWN)
-                    snake.front().setDir(UP);
-                break;
-            case 's':
-            case 'S':
-            case VK_DOWN:
-                //不可以反方向移动
-                if (snake.front().getDir() != UP)
-                    snake.front().setDir(DOWN);
-                break;
-            case 'a':
-            case 'A':
-            case VK_LEFT:
-                //不可以反方向移动
-                if (snake.front().getDir() != RIGHT)
-                    snake.front().setDir(LEFT);
-                break;
-            case 'd':
-            case 'D':
-            case VK_RIGHT:
-                //不可以反方向移动
-                if (snake.front().getDir() != LEFT)
-                    snake.front().setDir(RIGHT);
-                break;
-        }
-    }
-}
-
 //生成食物，食物不能在蛇身上
 void createFood(deque<Snake> &snake, Food &food) {
     //生成食物,直到食物不在蛇身上为止
@@ -237,7 +202,72 @@ bool isEatFood(const deque<Snake> &snake, const Food &food) {
     }
     return false;
 }
+void scoreShow(int& score){
+    //设置得分信息
+    //1.颜色
+    settextcolor(RGB(255, 255, 255));
+    //2.字体
+    settextstyle(20, 0, _T("宋体"));
+    TCHAR scoreStr[16];
+    _stprintf(scoreStr, _T("Score: %d"), score);
+    //3.输出文字
+    outtextxy(0, 0, scoreStr);
+}
 
+//更改蛇移动方向
+void changeDirection(deque<Snake> &snake,Food &food,int &score) {
+    ExMessage msg = {0};
+    //获取键盘消息
+    while (peekmessage(&msg, EX_KEY)) {
+        //判断按键
+        if (msg.message == WM_KEYDOWN) {
+            cv.notify_one();
+            switch (msg.vkcode) {
+                case 'w':
+                case 'W':
+                case VK_UP:
+                    //不可以反方向移动
+                    if (snake.front().getDir() != DOWN)
+                        snake.front().setDir(UP);
+                    break;
+                case 's':
+                case 'S':
+                case VK_DOWN:
+                    //不可以反方向移动
+                    if (snake.front().getDir() != UP)
+                        snake.front().setDir(DOWN);
+                    break;
+                case 'a':
+                case 'A':
+                case VK_LEFT:
+                    //不可以反方向移动
+                    if (snake.front().getDir() != RIGHT)
+                        snake.front().setDir(LEFT);
+                    break;
+                case 'd':
+                case 'D':
+                case VK_RIGHT:
+                    //不可以反方向移动
+                    if (snake.front().getDir() != LEFT)
+                        snake.front().setDir(RIGHT);
+                    break;
+            }
+            //判断是否吃到食物
+            if (isEatFood(snake, food)) {
+                //吃到食物分数加一
+                score++;
+                //生成食物
+                createFood(snake, food);
+                //蛇移动
+                moveSnake(snake, true);
+            }
+            //设置得分信息
+            scoreShow(score);
+            //绘制蛇
+            moveSnake(snake);
+        }
+    }
+}
 int main() {
     initgraph(WIDTH, HEIGHT);//初始化图形窗口
     //定义一条蛇
@@ -254,7 +284,7 @@ int main() {
     while (true) {
         moveSnake(snake);
         //更改蛇移动方向
-        changeDirection(snake);
+        changeDirection(snake, food, score);
         //判断是否吃到食物
         if (isEatFood(snake, food)) {
             //吃到食物分数加一
@@ -265,14 +295,7 @@ int main() {
             moveSnake(snake, true);
         }
         //设置得分信息
-        //1.颜色
-        settextcolor(RGB(255, 255, 255));
-        //2.字体
-        settextstyle(20, 0, _T("宋体"));
-        TCHAR scoreStr[16];
-        _stprintf(scoreStr, _T("Score: %d"), score);
-        //3.输出文字
-        outtextxy(0, 0, scoreStr);
+        scoreShow(score);
     }
     return 0;
 }

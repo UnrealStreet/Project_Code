@@ -11,6 +11,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fexec-charset=GBK")#该方法使�
 include_directories(${PROJECT_SOURCE_DIR}/include/SimpleAccount)#引入绝对路径include文件下的头文件
 include_directories(${PROJECT_SOURCE_DIR}/include/Leetcode)#引入绝对路径include文件下的头文件
 #include_directories(${PROJECT_SOURCE_DIR}/include/**.h)#引入绝对路径include文件下的头文件
+link_libraries(libeasyx.a)#引入EasyX相关的库文件
 
 add_executable(main main.cpp)
 add_executable(isPrime Instance/isPrime.cpp)
